@@ -54,7 +54,7 @@ ggplot(graphData) +
                                  " " = "black"), na.value = "black") +
   ggtitle(assocLocus)
 
-ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/overall/",assocLocus,".png", sep=""))
+ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/overall/",assocLocus, "_overallRisk", ".png", sep=""))
 
 }
 
@@ -94,7 +94,7 @@ ggplot(graphData) +
                                  " " = "black"), na.value = "black") +
   ggtitle(assocLocus)
 
-ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/erneg/", assocLocus, ".png", sep=""))
+ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/erneg/", assocLocus, "_ERnegRisk ".png", sep=""))
 
 }
 
