@@ -63,7 +63,7 @@ lapply(unique(eugene.overall.regions$locus), PlotManhattanOverall)
 ##############
 ### ERNEG RISK 
 
-manhattanERneg = function(i) {
+PlotManhattanERneg = function(i) {
  
 assocLocus = eugene.erneg.regions %>% filter(locus == i)  %>% select(locus) %>% as.character
 locusChr   = eugene.erneg.regions %>% filter(locus == i) %>% select(V1)
@@ -94,8 +94,8 @@ ggplot(graphData) +
                                  " " = "black"), na.value = "black") +
   ggtitle(assocLocus)
 
-ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/erneg/", assocLocus, "_ERnegRisk ".png", sep=""))
+ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/erneg/", assocLocus, "_ERnegRisk", ".png", sep=""))
 
 }
 
-lapply(unique(eugene.erneg.regions$locus), manhattanERneg)
+lapply(unique(eugene.erneg.regions$locus), PlotManhattanERneg)
