@@ -12,7 +12,6 @@ eugeneKnown        = read.table(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/da
 eugeneSNPpositions = read.table(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/data/EUGENE.BREAST.snps.bed", sep = ""), header=F)
 bcacFMdata         = read_delim(paste(homeDir, "BCAC_finemapping/bcac.oa.finemapping_added.rsIDs", sep = ""), delim= '\t', col_names=T)
 
-
 #
 eugeneKnown            = left_join(eugeneKnown, eugeneSNPpositions, by = c("EUGENE.eQTL" = "V4"))
 eugeneKnown            = eugeneKnown %>% filter(EUGENE.analysis == "BREAST")
@@ -21,37 +20,39 @@ ernegLoci              = eugeneKnown %>% select(locus, GWAS) %>% filter(GWAS == 
 eugene.overall.regions = left_join(overallLoci, bcRegions, by = c("locus" = "V4"))
 eugene.erneg.regions   = left_join(ernegLoci, bcRegions, by = c("locus" = "V4"))
 
-###################################
-########### OVERALL RISK 
+################
+### OVERALL RISK 
 
-manhattanOverall = function(i) {
+PlotManhattanOverall = function(i) {
  
-assocLocus = eugene.overall.regions %>% filter(locus == i)  %>% select(locus) %>% as.character
+assocLocus = eugene.overall.regions %>% filter(locus == i) %>% select(locus) %>% as.character
 locusChr   = eugene.overall.regions %>% filter(locus == i) %>% select(V1)
 minPos     = eugene.overall.regions %>% filter(locus == i) %>% select(V2) %>% as.numeric
 maxPos     = eugene.overall.regions %>% filter(locus == i) %>% select(V3) %>% as.numeric
 eugeneSNPs = eugeneKnown %>% filter(locus == i) %>% select(V3) %>% mutate(eugene = "eugene")
-candidates = bcacFMdata %>% filter(locus == sub("BCAC_FM_", "", i), type == "candidate_SNP") %>% select(position) %>% mutate(candidate = "candidate")
+candidates = bcacFMdata %>% filter(locus == sub("BCAC_FM_", "", i), type != "excluded_SNP") %>% select(position, type)
 
 assocData  = read.table(paste(homeDir, "BCAC_summaryStats/overall_position.space.pvalue_byChromosome/", locusChr[[1]], sep=""), header=F, )
 
 graphData  = assocData %>% filter(V1 > minPos & V1 < maxPos)
 graphData  = left_join(graphData, eugeneSNPs, by = c("V1" = "V3"))
 graphData  = left_join(graphData, candidates, by = c("V1" = "position"))
+graphData$type[is.na(graphData$type)] = "excluded_SNP"
 
+# plot
 ggplot(graphData) + 
-    geom_point(aes(V1,-log10(V2), colour = candidate)) + 
+    geom_point(aes(V1,-log10(V2), colour = type)) + 
     xlab(paste(locusChr[[1]]," position", sep='')) +
     ylab("-log10 P") +
     geom_hline(yintercept = -log10(5E-8), colour= 'red') + 
-    scale_colour_manual(values = c("eugene" = "red"), na.value = "black") +
+    scale_colour_manual(values = c("candidate_SNP" = "red", " " = "black"), na.value = "black") +
     ggtitle(assocLocus)
 
 ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/testManhattans",assocLocus,".png", sep=""))
 
 }
 
-lapply(unique(eugene.overall.regions$locus), manhattanOverall)
+lapply(unique(eugene.overall.regions$locus), PlotManhattanOverall)
 
 ###################################
 
