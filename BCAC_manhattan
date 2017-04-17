@@ -40,17 +40,21 @@ graphData  = left_join(graphData, candidates, by = c("V1" = "position"))
 graphData$type[is.na(graphData$type)] = "excluded_SNP"
 graphData$eugene[is.na(graphData$eugene)] = "nonEUGENE_SNP"
 
-# plot
+# plot - SNP type in colour, EUGENE SNP is a triangle
 ggplot(graphData) + 
   geom_point(aes(V1, -log10(V2), colour = type)) +
-  geom_point(data = graphData %>% filter(eugene == "EUGENE_SNP"), aes(V1, -log10(V2), shape = eugene)) + 
+  geom_point(data = graphData %>% filter(eugene == "EUGENE_SNP"), aes(V1, -log10(V2)), shape = 2, size = 2, colour = 'red', stroke = 1) + 
   xlab(paste(locusChr[[1]]," position", sep='')) +
   ylab("-log10 P") +
   geom_hline(yintercept = -log10(5E-8), colour = 'red') + 
-  scale_colour_manual(values = c("candidate_SNP" = "red", " " = "black"), na.value = "black") +
+  scale_colour_manual(values = c("candidate_SNP" = "blue", 
+                                 "weaker_secondary_signals" = "green", 
+                                 "bcac_cimba_secondary_signals" = "pink",
+                                 "cimba_secondary_signals" = "violet",
+                                 " " = "black"), na.value = "black") +
   ggtitle(assocLocus)
 
-ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/testManhattans",assocLocus,".png", sep=""))
+ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/testManhattans/",assocLocus,".png", sep=""))
 
 }
 
