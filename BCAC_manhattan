@@ -49,18 +49,19 @@ ggplot(graphData) +
   geom_hline(yintercept = -log10(5E-8), colour = 'red') + 
   scale_colour_manual(values = c("candidate_SNP" = "blue", 
                                  "weaker_secondary_signals" = "green", 
-                                 "bcac_cimba_secondary_signals" = "pink",
-                                 "cimba_secondary_signals" = "violet",
+                                 "bcac_cimba_secondary_signals" = "violet",
+                                 "cimba_secondary_signals" = "orange",
                                  " " = "black"), na.value = "black") +
   ggtitle(assocLocus)
 
-ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/testManhattans/",assocLocus,".png", sep=""))
+ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/overall/",assocLocus,".png", sep=""))
 
 }
 
 lapply(unique(eugene.overall.regions$locus), PlotManhattanOverall)
 
-###################################
+##############
+### ERNEG RISK 
 
 manhattanERneg = function(i) {
  
@@ -68,22 +69,32 @@ assocLocus = eugene.erneg.regions %>% filter(locus == i)  %>% select(locus) %>% 
 locusChr   = eugene.erneg.regions %>% filter(locus == i) %>% select(V1)
 minPos     = eugene.erneg.regions %>% filter(locus == i) %>% select(V2) %>% as.numeric
 maxPos     = eugene.erneg.regions %>% filter(locus == i) %>% select(V3) %>% as.numeric
-eugeneSNPs = eugeneKnown %>% filter(locus == i) %>% select(V3) %>% mutate(eugene = "eugene")
+eugeneSNPs = eugeneKnown %>% filter(locus == i) %>% select(V3) %>% mutate(eugene = "EUGENE_SNP")
+candidates = bcacFMdata %>% filter(locus == sub("BCAC_FM_", "", i), type != "excluded_SNP") %>% select(position, type)
 
-assocData=read.table(paste("/home/jonathanb/genomics/projects/jb_functional_annotation_pipeline/data/bcac_specific_data/erneg_position.space.pvalue_byChromosome/",locusChr[[1]], sep=""), header=F, )
+assocData  = read.table(paste(homeDir, "BCAC_summaryStats/erneg_position.space.pvalue_byChromosome/", locusChr[[1]], sep=""), header=F, )
 
-graphData = assocData %>% filter(V1 > minPos & V1 < maxPos)
-graphData = left_join(graphData, eugeneSNPs, by = c("V1" = "V3"))
+graphData  = assocData %>% filter(V1 > minPos & V1 < maxPos)
+graphData  = left_join(graphData, eugeneSNPs, by = c("V1" = "V3"))
+graphData  = left_join(graphData, candidates, by = c("V1" = "position"))
+graphData$type[is.na(graphData$type)] = "excluded_SNP"
+graphData$eugene[is.na(graphData$eugene)] = "nonEUGENE_SNP"
 
+# plot - SNP type in colour, EUGENE SNP is a triangle
 ggplot(graphData) + 
-    geom_point(aes(V1,-log10(V2), colour=eugene)) + 
-    xlab(paste(locusChr[[1]]," position", sep='')) +
-    ylab("-log10 P") +
-    geom_hline(yintercept = -log10(5E-8), colour= 'red') + 
-    scale_colour_manual(values = c("eugene" = "red"), na.value = "black") +
-    ggtitle(assocLocus)
+  geom_point(aes(V1, -log10(V2), colour = type)) +
+  geom_point(data = graphData %>% filter(eugene == "EUGENE_SNP"), aes(V1, -log10(V2)), shape = 2, size = 2, colour = 'red', stroke = 1) + 
+  xlab(paste(locusChr[[1]]," position", sep='')) +
+  ylab("-log10 P") +
+  geom_hline(yintercept = -log10(5E-8), colour = 'red') + 
+  scale_colour_manual(values = c("candidate_SNP" = "blue", 
+                                 "weaker_secondary_signals" = "green", 
+                                 "bcac_cimba_secondary_signals" = "violet",
+                                 "cimba_secondary_signals" = "orange",
+                                 " " = "black"), na.value = "black") +
+  ggtitle(assocLocus)
 
-ggsave(paste("/home/jonathanb/genomics/projects/qimr_EUGENE/working/2017-04-13/EUGENE.hits.at.knonw.regions/manhattans/erneg/",assocLocus,".png", sep=""))
+ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/erneg/", assocLocus, ".png", sep=""))
 
 }
 
