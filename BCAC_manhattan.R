@@ -47,11 +47,12 @@ ggplot(graphData) +
   xlab(paste(locusChr[[1]]," position", sep='')) +
   ylab("-log10 P") +
   geom_hline(yintercept = -log10(5E-8), colour = 'red') + 
-  scale_colour_manual(values = c("candidate_SNP" = "blue", 
-                                 "weaker_secondary_signals" = "green", 
+  scale_colour_manual(values = c("candidate_SNP"                = "blue", 
+                                 "weaker_secondary_signals"     = "green", 
                                  "bcac_cimba_secondary_signals" = "violet",
-                                 "cimba_secondary_signals" = "orange",
-                                 " " = "black"), na.value = "black") +
+                                 "cimba_secondary_signals"      = "orange",
+                                 " "                            = "black"), 
+                       na.value = "black") +
   ggtitle(assocLocus)
 
 ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/overall/",assocLocus, "_overallRisk", ".png", sep=""))
@@ -92,7 +93,7 @@ ggplot(graphData) +
                                  "bcac_cimba_secondary_signals" = "violet",
                                  "cimba_secondary_signals"      = "orange",
                                  " "                            = "black"), 
-                                 na.value = "black") +
+                      na.value = "black") +
   ggtitle(assocLocus)
 
 ggsave(paste(homeDir, "BCAC_FM_includesUCSCandEUGENE/manhattans/erneg/", assocLocus, "_ERnegRisk", ".png", sep=""))
