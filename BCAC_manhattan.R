@@ -27,17 +27,18 @@ PlotManhattanOverall = function(i) {
  
 assocLocus = eugene.overall.regions %>% filter(locus == i) %>% select(locus) %>% as.character
 locusChr   = eugene.overall.regions %>% filter(locus == i) %>% select(V1)
-minPos     = eugene.overall.regions %>% filter(locus == i) %>% select(V2) %>% as.numeric
-maxPos     = eugene.overall.regions %>% filter(locus == i) %>% select(V3) %>% as.numeric
-eugeneSNPs = eugeneKnown %>% filter(locus == i) %>% select(V3) %>% mutate(eugene = "EUGENE_SNP")
-candidates = bcacFMdata %>% filter(locus == sub("BCAC_FM_", "", i), type != "excluded_SNP") %>% select(position, type)
+minPos     = eugene.overall.regions %>% filter(locus == i) %>% select(V2)    %>% as.numeric
+maxPos     = eugene.overall.regions %>% filter(locus == i) %>% select(V3)    %>% as.numeric
+eugeneSNPs = eugeneKnown            %>% filter(locus == i) %>% select(V3)    %>% mutate(eugene = "EUGENE_SNP")
+candidates = bcacFMdata             %>% filter(locus == sub("BCAC_FM_", "", i), type != "excluded_SNP") %>% select(position, type)
 
 assocData  = read.table(paste(homeDir, "BCAC_summaryStats/overall_position.space.pvalue_byChromosome/", locusChr[[1]], sep=""), header=F, )
 
 graphData  = assocData %>% filter(V1 > minPos & V1 < maxPos)
 graphData  = left_join(graphData, eugeneSNPs, by = c("V1" = "V3"))
 graphData  = left_join(graphData, candidates, by = c("V1" = "position"))
-graphData$type[is.na(graphData$type)] = "excluded_SNP"
+
+graphData$type[is.na(graphData$type)]     = "excluded_SNP"
 graphData$eugene[is.na(graphData$eugene)] = "nonEUGENE_SNP"
 
 # plot - SNP type in colour, EUGENE SNP is a triangle
@@ -64,7 +65,8 @@ lapply(unique(eugene.overall.regions$locus), PlotManhattanOverall)
 ### ERNEG RISK 
 
 PlotManhattanERneg = function(i) {
- 
+
+# data input 
 assocLocus = eugene.erneg.regions %>% filter(locus == i)  %>% select(locus) %>% as.character
 locusChr   = eugene.erneg.regions %>% filter(locus == i) %>% select(V1)
 minPos     = eugene.erneg.regions %>% filter(locus == i) %>% select(V2) %>% as.numeric
